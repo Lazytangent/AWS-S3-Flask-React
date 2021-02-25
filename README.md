@@ -59,3 +59,5 @@ pipenv install boto3
 16. Review your new user and make sure the policy you've attached is correct. Then click `Create user`.
 17. You will now get the `Access Key ID` and the `Secret Access Key`. Make sure to save both somewhere safe. You can (should) download the `.csv` file. **Store this somewhere safe on your computer.**
     * Note: If you don't somehow get your keys here, you will have to generate new keys through IAM because AWS will not give you an old secret key after this page.
+
+## Set up AWS S3 in your backend

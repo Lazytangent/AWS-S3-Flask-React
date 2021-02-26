@@ -61,3 +61,64 @@ pipenv install boto3
     * Note: If you don't somehow get your keys here, you will have to generate new keys through IAM because AWS will not give you an old secret key after this page.
 
 ## Set up AWS S3 in your backend
+
+`config.py`
+
+Add the following lines to your Config class inside your config file.
+
+```python
+S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
+S3_KEY = os.environ.get("S3_ACCESS_KEY")
+S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
+S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
+```
+
+Your entire `config.py` file should now look something like this:
+
+```python
+import os
+
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_ECHO = True
+
+    S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
+    S3_KEY = os.environ.get("S3_ACCESS_KEY")
+    S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
+    S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
+```
+
+`awsS3.py`
+
+Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.
+
+In there, you will see that you are using the package `boto3` to connect to your AWS S3 bucket. This is getting your keys from your config file, so make sure to add your keys to you `.env` file.
+
+```env
+S3_BUCKET_NAME=
+S3_ACCESS_KEY=
+S3_SECRET_ACCESS_KEY=
+```
+
+##### How to set up your credentials
+
+All you need to do is have the correct configuration in your `config.py` file and have the environment variables set. Once you deploy to Heroku, you will also need to set the keys as environment variables there.
+
+### MAKE SURE TO GITIGNORE YOUR .ENV FILE
+
+## Public File Uploads
+
+If you absolutely don't want your files to be publicly available to just any user, then you want your files to be private. If you don't care if users are able to access those files, then you can set up the files to be publicly readable.
+
+Public upload is recommended for most of the use cases for your portfolio projects.
+
+### Public Files
+
+How to set up uploading and reading public files on the backend.
+
+#### Public File Write Configuration
+
+

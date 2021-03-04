@@ -14,6 +14,8 @@
 pipenv install boto3
 ```
 
+Don't forget to run `pipenv lock -r > requirements.txt` after installing boto3!
+
 **Create your AWS User and Bucket**
 
 1. Navigate to aws.amazon.com and `Create an AWS Account`.
@@ -62,9 +64,23 @@ pipenv install boto3
 
 ## Set up AWS S3 in your backend
 
-`config.py`
+#### `.env`
 
-Add the following lines to your Config class inside your config file.
+Now that you have your AWS keys, you will need to set them in your `.env` file. 
+
+```env
+
+S3_BUCKET_NAME=<your bucket name>
+S3_ACCESS_KEY=<your aws access key>
+S3_SECRET_ACCESS_KEY=<your aws secret access key>
+```
+Make sure that these are set in your BACKEND `.env` file (the one in the root of your project). Now is  a very good time to double-check that your `.env` is listed in your backend `.gitignore`.
+
+*Note: You will need to provide these keys to Heroku when you are ready to deploy.
+
+#### `config.py`
+
+Now that we've added our AWS Keys to our `.env`, we will want to access them through the rest of our app.  To do that, add the following lines to your Config class inside your `config.py` file. 
 
 ```python
 S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
@@ -73,7 +89,7 @@ S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
 S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
 ```
 
-Your entire `config.py` file should now look something like this:
+  Your entire `config.py` file should now look something like this:
 
 ```python
 import os
@@ -91,22 +107,98 @@ class Config:
     S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
 ```
 
-`awsS3.py`
+####`awsS3.py`
 
-Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.
+Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.  Copy the following code inside: 
 
-In there, you will see that you are using the package `boto3` to connect to your AWS S3 bucket. This is getting your keys from your config file, so make sure to add your keys to you `.env` file.
+```python
+import boto3, botocore
+from .config import Config
 
-```env
-S3_BUCKET_NAME=
-S3_ACCESS_KEY=
-S3_SECRET_ACCESS_KEY=
+
+s3 = boto3.client(
+   "s3",
+   aws_access_key_id=Config.S3_KEY,
+   aws_secret_access_key=Config.S3_SECRET
+)
 ```
 
-##### How to set up your credentials
+In here, you will see that you are using the `boto3.client` method to connect to your AWS S3 bucket. This works because we are able to pass it your AWS Keys that we are grabbing your Config object, `Config.S3_KEY` and `Config.S3_SECRET`.  
 
-All you need to do is have the correct configuration in your `config.py` file and have the environment variables set. Once you deploy to Heroku, you will also need to set the keys as environment variables there.
+Now copy this into your file:
 
+```python
+
+def upload_file_to_s3(file, bucket_name, acl="public-read"):
+
+    try:
+
+        s3.upload_fileobj(
+            file,
+            bucket_name,
+            file.filename,
+            ExtraArgs={
+                "ACL": acl,
+                "ContentType": file.content_type
+            }
+        )
+
+    except Exception as e:
+        # This is a catch all exception, edit this part to fit your needs.
+        print("Something Happened: ", e)
+        return e
+```
+
+Here we are defining our function that will allow you to store a file to your S3 bucket.  Notice that it takes in a `file`, `bucket_name` and an argument called `acl` that is set to `"public-read"` by default.  Because of this default param, when we are ready to call this function we only need to pass in our `file` and our `bucket_name`.  
+
+Also note that inside our function we are calling the `s3.upload_fileobj` method.  In addition to passing this method our `file` and `bucket_name`, we are giving it an `ExrtaArgs` object that contains our POST request headers.  Thanks to these `ExtraArgs` we do not need to specify any request headers when making our POST request. 
+
+Lastly, copy this return statement at the end of your function 
+
+```python
+return f"{Config.S3_LOCATION}{file.filename}"
+```
+This return statement will give us the URL to the file we've just uploaded to our bucket. 
+
+By now, your whole `aws_s3.py` file should look like this:
+
+```python
+
+import boto3, botocore
+from .config import Config
+
+
+s3 = boto3.client(
+   "s3",
+   aws_access_key_id=Config.S3_KEY,
+   aws_secret_access_key=Config.S3_SECRET
+)
+
+def upload_file_to_s3(file, bucket_name, acl="public-read"):
+
+    try:
+
+        s3.upload_fileobj(
+            file,
+            bucket_name,
+            file.filename,
+            ExtraArgs={
+                "ACL": acl,
+                "ContentType": file.content_type
+            }
+        )
+
+    except Exception as e:
+        # This is a catch all exception, edit this part to fit your needs.
+        print("Something Happened: ", e)
+        return e
+
+
+    return f"{Config.S3_LOCATION}{file.filename}"
+```
+
+
+####If you haven't already:
 ### MAKE SURE TO GITIGNORE YOUR .ENV FILE
 
 ## Public File Uploads

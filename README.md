@@ -47,11 +47,11 @@ Don't forget to run `pipenv lock -r > requirements.txt` after installing boto3!
   ]
 }
 ```
-    * Make sure to replace `<NAME OF BUCKET>` with the name of your bucket.
-    * Click `Next: Tags`
-    * Click `Next: Review`
-    * Give the policy a name (maybe something like `s3-access-to-name-of-project`).
-    * Click `Create policy`
+* Make sure to replace `<NAME OF BUCKET>` with the name of your bucket.
+* Click `Next: Tags`
+* Click `Next: Review`
+* Give the policy a name (maybe something like `s3-access-to-name-of-project`).
+* Click `Create policy`
 
 11. After creating the policy, go back to the IAM Management Console where you were creating a user.
 12. Click the refresh icon in the middle of the screen above the table of policies.
@@ -107,7 +107,7 @@ class Config:
     S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
 ```
 
-####`awsS3.py`
+#### `awsS3.py`
 
 Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.  Copy the following code inside: 
 
@@ -198,7 +198,7 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 ```
 
 
-####If you haven't already:
+#### If you haven't already:
 ### MAKE SURE TO GITIGNORE YOUR .ENV FILE
 
 ## Public File Uploads

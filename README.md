@@ -112,7 +112,8 @@ class Config:
 Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.  Copy the following code inside: 
 
 ```python
-import boto3, botocore
+import boto3
+import botocore
 from .config import Config
 
 
@@ -164,7 +165,8 @@ By now, your whole `aws_s3.py` file should look like this:
 
 ```python
 
-import boto3, botocore
+import boto3
+import botocore
 from .config import Config
 
 
@@ -222,7 +224,7 @@ Here we destructure the file and associated form fields from the initial form su
 ```javascript
  const form = new FormData()
  form.append('user_id', user_id)
- // repeat as necessary  for each required form field
+ // repeat as necessary for each required form field
  form.append('file', file)
 ```
 
@@ -249,18 +251,18 @@ export const uploadFile = (fileForm) => async (dispatch) => {
            form,
            fields, */
            file // this is the file for uploading
-    } = fileForm
+    } = fileForm;
 
-    const form = new FormData()
-    form.append('user_id', user_id)
+    const form = new FormData();
+    form.append('user_id', user_id);
     // repeat as necessary  for each required form field
-    form.append('file', file)
+    form.append('file', file);
 
     const res = await fetch('/api/<your_api_route>', {
-    method: "POST", 
-    body: form
-    })
-}
+        method: "POST", 
+        body: form
+    });
+};
 ```
 
 We'll let you figure out what to do with the rest of the thunk, but for now she's ready to hit your backend! 
@@ -274,13 +276,13 @@ If you haven't already, create a `route` file inside the `api` directory of your
 Begin by including these import statements along with all of your usual ones.
 
 ```python
-
-from flask import Blueprint, request
-from flask_login import login_required
 import boto3
 import botocore
-from ..config import Config
-from ..aws_s3 import *
+from flask import Blueprint, request
+from flask_login import login_required
+
+from app.config import Config
+from app.aws_s3 import *
 from app.models import db, <Your_Model>
 #any other imports as needed
 ```
@@ -298,18 +300,18 @@ file_route = Blueprint('file', __name__)
 @login_required
 def upload_file:
     if file:
-        file_url = upload_file_to_s3(file, Config.S3_BUCKET)
-        # create an instance of <Your_Model>
-        file = File(
-            user_id=request.form.get('user_id')
-            #extract any form fields you've appended to the 
-            #body of your POST request 
-            #i.e.
-            url=file_url
-        )  
-        db.session.add(file)  
-        db.session.commit()
-        return file.to_dict()  
+         file_url = upload_file_to_s3(file, Config.S3_BUCKET)
+         # create an instance of <Your_Model>
+         file = File(
+             user_id=request.form.get('user_id')
+             # extract any form fields you've appended to the 
+             # body of your POST request 
+             # i.e.
+             url=file_url
+         )  
+         db.session.add(file)  
+         db.session.commit()
+         return file.to_dict()  
      else: return No File Attached! 
 ```
 Here we've used Flask's request object to parse our POST request, which allows us to pass our intended file through the `upload_file_to_s3` method and retrieve our AWS URL.  We can further use `request.form.get('<field_name>')` to parse out each incoming form field and add them to our Model instance.  Finally we pass in our `file_url` that we received from our S3 Bucket and assign it to the specified column in our model. 
@@ -317,13 +319,13 @@ Here we've used Flask's request object to parse our POST request, which allows u
 Your whole `route.py` file should look something like this: 
 
 ```python
-
-from flask import Blueprint, request
-from flask_login import login_required
 import boto3
 import botocore
-from ..config import Config
-from ..aws_s3 import *
+from flask import Blueprint, request
+from flask_login import login_required
+
+from app.config import Config
+from app.aws_s3 import *
 from app.models import db, <Your_Model>
 #any other imports as needed
 

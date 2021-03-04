@@ -107,7 +107,7 @@ class Config:
     S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
 ```
 
-#### `awsS3.py`
+#### `aws_s3.py`
 
 Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.  Copy the following code inside: 
 

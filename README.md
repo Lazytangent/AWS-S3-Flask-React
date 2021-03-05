@@ -297,6 +297,11 @@ file_route = Blueprint('file', __name__)
 @file_route.route('/', methods=["POST"])
 @login_required
 def upload_file:
+    if "file" not in request.files:
+        return "No user_file key in request.files"
+
+    file = request.files["file"]
+    
     if file:
         file_url = upload_file_to_s3(file, Config.S3_BUCKET)
         # create an instance of <Your_Model>
@@ -334,6 +339,11 @@ file_route = Blueprint('file', __name__)
 @file_route.route('/', methods=["POST"])
 @login_required
 def upload_file:
+    if "file" not in request.files:
+        return "No user_file key in request.files"
+
+    file = request.files["file"]
+    
     if file:
         file_url = upload_file_to_s3(file, Config.S3_BUCKET)
         # create an instance of <Your_Model>

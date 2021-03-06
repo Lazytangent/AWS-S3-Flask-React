@@ -2,6 +2,7 @@ import boto3
 import botocore
 from .config import Config
 
+# These are the allowed file types, edit this part to fit your needs
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'svg'}
 
 s3 = boto3.client(
@@ -22,6 +23,7 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
                           })
 
     except Exception as e:
+        # This is catch all exception, edit this part to fit your needs.
         print("Something Happened: ", e)
         return e
 
@@ -31,14 +33,3 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 def allowed_file(filename):
     return '.' in filename and \
         filename.split('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def validation_errors_to_error_messages(validation_errors):
-    """
-    Simple function that turns the WTForms validation errors into a simple list
-    """
-    error_messages = []
-    for field in validation_errors:
-        for error in validation_errors[field]:
-            error_messages.append(f"{field} : {error}")
-    return error_messages

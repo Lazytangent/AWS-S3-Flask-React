@@ -112,7 +112,8 @@ class Config:
 Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.  Copy the following code inside: 
 
 ```python
-import boto3, botocore
+import boto3
+import botocore
 from .config import Config
 
 
@@ -123,7 +124,7 @@ s3 = boto3.client(
 )
 ```
 
-In here, you will see that you are using the `boto3.client` method to connect to your AWS S3 bucket. This works because we are able to pass it your AWS Keys that we are grabbing your Config object, `Config.S3_KEY` and `Config.S3_SECRET`.  
+In here, you will see that you are using the `boto3.client` method to connect to your AWS S3 bucket. This works because we are able to pass it your AWS Keys that we are grabbing from your Config object, `Config.S3_KEY` and `Config.S3_SECRET`.  
 
 Now copy this into your file:
 
@@ -153,18 +154,19 @@ Here we are defining our function that will allow you to store a file to your S3
 
 Also note that inside our function we are calling the `s3.upload_fileobj` method.  In addition to passing this method our `file` and `bucket_name`, we are giving it an `ExrtaArgs` object that contains our POST request headers.  Thanks to these `ExtraArgs` we do not need to specify any request headers when making our POST request. 
 
-Lastly, copy this return statement at the end of your function 
+Lastly, copy the following return statement to the end of your function. This return statement will give us the URL to the file we've just uploaded to our bucket. 
 
 ```python
 return f"{Config.S3_LOCATION}{file.filename}"
 ```
-This return statement will give us the URL to the file we've just uploaded to our bucket. 
+
 
 By now, your whole `aws_s3.py` file should look like this:
 
 ```python
 
-import boto3, botocore
+import boto3
+import botocore
 from .config import Config
 
 
@@ -200,6 +202,168 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 
 #### If you haven't already:
 ### MAKE SURE TO GITIGNORE YOUR .ENV FILE
+
+## Sending Your POST request
+
+Now it's time to set up our POST request by way of a Redux thunk.  Hopefully you know by how to submit a form from your React component through to a thunk!  The form we are receiving should contain the file we are intending to upload along with all other necessary fields to persist to our database.  An example looks like this: 
+
+```javascript
+export const uploadFile = (fileForm) => async (dispatch) => {
+    const {
+        user_id, 
+        /* all,
+           other,
+           form,
+           fields, */
+           file // this is the file for uploading
+    } = fileForm
+}
+```
+Here we destructure the file and associated form fields from the initial form submission.  Next we will package them up in a new upload-worthy style form.  
+
+```javascript
+ const form = new FormData()
+ form.append('user_id', user_id)
+ // repeat as necessary for each required form field
+ form.append('file', file)
+```
+
+We've now created a new FormData object and appended our file and associated form fiels.  This object is now ready to submit to our backend to get persisted in our data base.  We will do so by setting the following:
+
+```javascript
+const res = await fetch('/api/<your_api_route>', {
+    method: "POST", 
+    body: form
+})
+```
+
+Remember how we already prescribed our request headed back in our `aws_s3.py`?  No need to set any here!  
+
+
+Your overall thunk should be looking like this (with `<your_api_route>` replaced by your actual API route): 
+
+```javascript
+export const uploadFile = (fileForm) => async (dispatch) => {
+    const {
+        user_id, 
+        /* all,
+           other,
+           form,
+           fields, */
+           file // this is the file for uploading
+    } = fileForm;
+
+    const form = new FormData();
+    form.append('user_id', user_id);
+    // repeat as necessary  for each required form field
+    form.append('file', file);
+
+    const res = await fetch('/api/<your_api_route>', {
+        method: "POST", 
+        body: form
+    });
+};
+```
+
+We'll let you figure out what to do with the rest of the thunk, but for now she's ready to hit your backend! 
+
+## Setting Your Route 
+
+Here we will set up our route that will call our `upload_file_to_s3` function that we've defined in our `aws_s3.py` file. We will  then push the resulting URL to our database.  
+
+If you haven't already, create a `route` file inside the `api` directory of your app.  The path should look something like this:  `app/api/<you_route_file.py>`
+
+Begin by including these import statements along with all of your usual ones.
+
+```python
+import boto3
+import botocore
+from flask import Blueprint, request
+from flask_login import login_required
+
+from app.config import Config
+from app.aws_s3 import *
+from app.models import db, <Your_Model>
+#any other imports as needed
+```
+Be sure to replace `<Your_Model>` with the name of the Model you will be persisting to.  
+
+Next we will define our route. For the sake of this walkthrough let's call it `file_route`.  This where we will call our file uploading function as well receive the file we will be passing into it.  This is where the magic happens! 
+
+```python
+
+file_route = Blueprint('file', __name__)
+
+  #Don't forget to register your Blueprint
+
+@file_route.route('/', methods=["POST"])
+@login_required
+def upload_file:
+    if "file" not in request.files:
+        return "No user_file key in request.files"
+
+    file = request.files["file"]
+    
+    if file:
+         file_url = upload_file_to_s3(file, Config.S3_BUCKET)
+         # create an instance of <Your_Model>
+         file = File(
+             user_id=request.form.get('user_id')
+             # extract any form fields you've appended to the 
+             # body of your POST request 
+             # i.e.
+             url=file_url
+         )  
+         db.session.add(file)  
+         db.session.commit()
+         return file.to_dict()  
+     else: return No File Attached! 
+```
+Here we've used Flask's request object to parse our POST request, which allows us to pass our intended file through the `upload_file_to_s3` method and retrieve our AWS URL.  We can further use `request.form.get('<field_name>')` to parse out each incoming form field and add them to our Model instance.  Finally we pass in our `file_url` that we received from our S3 Bucket and assign it to the specified column in our model. 
+
+Your whole `route.py` file should look something like this: 
+
+```python
+import boto3
+import botocore
+from flask import Blueprint, request
+from flask_login import login_required
+
+from app.config import Config
+from app.aws_s3 import *
+from app.models import db, <Your_Model>
+#any other imports as needed
+
+file_route = Blueprint('file', __name__)
+
+  #Don't forget to register your Blueprint
+
+@file_route.route('/', methods=["POST"])
+@login_required
+def upload_file:
+    if "file" not in request.files:
+        return "No user_file key in request.files"
+
+    file = request.files["file"]
+    
+    if file:
+        file_url = upload_file_to_s3(file, Config.S3_BUCKET)
+        # create an instance of <Your_Model>
+        file = File(
+            user_id=request.form.get('user_id')
+            #extract any form fields you've appended to the 
+            #body of your POST request 
+            #i.e.
+            url=file_url
+        )  
+        db.session.add(file)  
+        db.session.commit()
+        return file.to_dict()  
+     else: return No File Attached! 
+
+```
+
+And that's It!  If you did everything correctly you should be able to start storing files to your S3 Bucket and pushing their corresponding URL into your database.  
 
 ## Public File Uploads
 

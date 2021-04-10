@@ -13,6 +13,6 @@ class File(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user": self.user.to_dict(),
+            "user": self.user.to_simple_dict(),
             "url": self.url,
         }

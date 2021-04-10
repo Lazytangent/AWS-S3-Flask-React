@@ -8,6 +8,7 @@ import NavBar from "./components/NavBar";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import UsersList from "./components/UsersList";
 import User from "./components/User";
+import UploadFile from './components/UploadFile';
 import { authenticate } from "./store/session";
 
 const App = () => {
@@ -59,6 +60,9 @@ const App = () => {
           authenticated={authenticated}
         >
           <User />
+        </ProtectedRoute>
+        <ProtectedRoute path="/upload-file" authenticated={authenticated}>
+          <UploadFile />
         </ProtectedRoute>
         <ProtectedRoute path="/" exact={true} authenticated={authenticated}>
           <h1>My Home Page</h1>

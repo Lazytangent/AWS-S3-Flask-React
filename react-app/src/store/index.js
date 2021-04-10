@@ -8,7 +8,7 @@ import fileReducer from './files';
 const rootReducer = combineReducers({
   session: sessionReducer,
   users: usersReducer,
-  files: fileReducer,
+  file: fileReducer,
 });
 
 let enhancer;

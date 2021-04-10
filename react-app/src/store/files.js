@@ -39,7 +39,7 @@ const initialState = {};
 const fileReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_FILE:
-      return { ...state, [action.file.id]: action.file }
+      return action.file;
     default:
       return state;
   }

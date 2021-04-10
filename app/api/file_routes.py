@@ -17,7 +17,7 @@ def upload_file():
     file = request.files["file"]
 
     if file:
-        file_url = upload_file_to_s3(file, Config.S3_SECRET)
+        file_url = upload_file_to_s3(file, Config.S3_BUCKET)
         file = File(
             user_id=request.form.get('user_id'),
             url=file_url,

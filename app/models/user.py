@@ -27,3 +27,6 @@ class User(db.Model, UserMixin):
     def to_dict(self):
         return {"id": self.id, "username": self.username, "email": self.email,
                 "files": [file.to_dict() for file in self.files]}
+
+    def to_simple_dict(self):
+        return {"id": self.id, "username": self.username, "email": self.email}

@@ -30,7 +30,7 @@ const usersReducer = (state = initialState, action) => {
     case SET_USERS:
       return { ...Object.fromEntries(action.users.map((user) => [user.id, user])) };
     case SET_USER:
-      return { ...state, [action.user.id]: user };
+      return { ...state, [action.user.id]: action.user };
     default:
       return state;
   }

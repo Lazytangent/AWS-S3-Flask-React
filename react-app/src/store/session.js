@@ -1,5 +1,5 @@
 const SET_SESSION = 'session/SET_SESSION';
-export const REMOVE_SESSION = 'session/REMOVE_SESSION';
+const REMOVE_SESSION = 'session/REMOVE_SESSION';
 
 const setSession = (user) => {
   return {

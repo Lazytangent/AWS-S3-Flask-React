@@ -7,8 +7,8 @@ const setUsers = (users) => ({
 
 export const getUsers = () => async (dispatch) => {
   const res = await fetch('/api/users');
-  const users = await res.json();
-  setUsers(users);
+  const data = await res.json();
+  dispatch(setUsers(data.users));
 };
 
 const initialState = {};
@@ -16,7 +16,7 @@ const initialState = {};
 const usersReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_USERS:
-      return { ...action.users };
+      return { ...Object.fromEntries(action.users.map((user) => [user.id, user])) };
     default:
       return state;
   }

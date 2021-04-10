@@ -11,6 +11,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), nullable=False, unique=True)
     hashed_password = db.Column(db.String(255), nullable=False)
 
+    files = db.relationship("File", back_populates="user")
+
     @property
     def password(self):
         return self.hashed_password
@@ -23,4 +25,5 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password, password)
 
     def to_dict(self):
-        return {"id": self.id, "username": self.username, "email": self.email}
+        return {"id": self.id, "username": self.username, "email": self.email,
+                "files": [file.to_dict() for file in self.files]}

@@ -18,7 +18,7 @@ Don't forget to run `pipenv lock -r > requirements.txt` after installing boto3!
 
 **Create your AWS User and Bucket**
 
-1. Navigate to aws.amazon.com and `Create an AWS Account`.
+1. Navigate to [aws.amazon.com] and `Create an AWS Account`.
 2. Once signed into the AWS console, search for `S3: Scalable Storage in the
    Cloud` and click the link to go to the S3 Management Console
 3. Once there, click `Create Bucket`
@@ -377,13 +377,11 @@ specified column in our model.
 Your whole `route.py` file should look something like this:
 
 ```python
-import boto3
-import botocore
 from flask import Blueprint, request
 from flask_login import login_required
 
 from app.config import Config
-from app.aws_s3 import *
+from app.aws_s3 import upload_file_to_s3
 from app.models import db, <Your_Model>
 #any other imports as needed
 

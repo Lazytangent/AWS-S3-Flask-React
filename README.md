@@ -286,17 +286,17 @@ from app.aws_s3 import *
 from app.models import db, <Your_Model>
 #any other imports as needed
 ```
-Be sure to replace `<Your_Model>` with the name of the Model you will be persisting to.  
+Be sure to replace `<Your_Model>` with the name of the Model you will be persisting to.
 
-Next we will define our route. For the sake of this walkthrough let's call it `file_route`.  This where we will call our file uploading function as well receive the file we will be passing into it.  This is where the magic happens! 
+Next we will define our route. For the sake of this walkthrough let's call it `file_routes`.  This where we will call our file uploading function as well receive the file we will be passing into it.  This is where the magic happens! 
 
 ```python
 
-file_route = Blueprint('file', __name__)
+file_routes = Blueprint('file', __name__)
 
   #Don't forget to register your Blueprint
 
-@file_route.route('/', methods=["POST"])
+@file_routes.route('/', methods=["POST"])
 @login_required
 def upload_file:
     if "file" not in request.files:
@@ -334,11 +334,11 @@ from app.aws_s3 import *
 from app.models import db, <Your_Model>
 #any other imports as needed
 
-file_route = Blueprint('file', __name__)
+file_routes = Blueprint('file', __name__)
 
   #Don't forget to register your Blueprint
 
-@file_route.route('/', methods=["POST"])
+@file_routes.route('/', methods=["POST"])
 @login_required
 def upload_file:
     if "file" not in request.files:

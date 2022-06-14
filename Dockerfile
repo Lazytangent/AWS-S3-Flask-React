@@ -4,8 +4,6 @@ WORKDIR /react-app
 
 COPY react-app/. .
 
-ENV REACT_APP_BASE_URL=<Your REACT_APP_BASE_URL here>
-
 RUN npm install
 RUN npm run build
 

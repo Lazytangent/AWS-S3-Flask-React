@@ -3,12 +3,17 @@ volumes:
 
 services:
   flask:
+    build: .
     command: flask run --host 0.0.0.0
     ports:
       - 5000:5000
     environment:
       - FLASK_ENV=development
       - DATABASE_URL=postgresql://test:password@postgres/test
+      - SECRET_KEY=${SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET=${S3_SECRET_ACCESS_KEY}
     volumes:
       - .:/var/www
   postgres:

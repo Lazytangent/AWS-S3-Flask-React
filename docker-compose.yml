@@ -1,0 +1,50 @@
+volumes:
+  postgres-data: {}
+
+services:
+  flask:
+    command: flask run --host 0.0.0.0
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://test:password@postgres/test
+    volumes:
+      - .:/var/www
+  postgres:
+    image: postgres:14.3-alpine
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=test
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres-data:/var/lib/postgres/data
+  localstack:
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+    environment:
+      - SERVICES=s3,iam
+      - DEFAULT_REGION=us-east-2
+      - EAGER_SERVICE_LOADING=1
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  infra:
+    build:
+      context: ./infra
+    volumes:
+      - ./infra:/app
+    entrypoint: []
+    command: >
+      /bin/sh -c " \
+        while ! nc localstack 4566; \
+        do \
+          echo waiting for localstack; \
+          sleep 1; \
+        done; \
+        terraform init; \
+        time terraform apply -auto-approve -state-out=dumpedterraform.tfstate -var=\"localstack_host=http://localstack:4566\"
+      "

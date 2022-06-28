@@ -1,14 +1,14 @@
 # AWS S3 Demo with Flask-React Stack
 
-* PostgreSQL
-* Flask
-* React
+- PostgreSQL
+- Flask
+- React
 
 ## Set Up
 
 **Packages to install in your backend**
 
-* [boto3](https://github.com/boto/boto3)
+- [boto3](https://github.com/boto/boto3)
 
 ```bash
 pipenv install boto3
@@ -24,12 +24,12 @@ Don't forget to run `pipenv lock -r > requirements.txt` after installing boto3!
 3. Once there, click `Create Bucket`
 4. In the Create Bucket form, enter a name, choose a region, and leave all other
    options as default.
-    * You can opt to make all of your content in this bucket public by
-      unchecking the checkbox by `Block all public access` AND checking the
-      acknowledgment checkbox that shows up below.
-    * Create the bucket
-    * You're going to need the name of your bucket in a second, so you'll want
-      to keep this tab with your bucket open.
+   - You can opt to make all of your content in this bucket public by
+     unchecking the checkbox by `Block all public access` AND checking the
+     acknowledgment checkbox that shows up below.
+   - Create the bucket
+   - You're going to need the name of your bucket in a second, so you'll want
+     to keep this tab with your bucket open.
 5. In the top search bar, search for `IAM: Manage access to AWS resources` and
    open the link in a new tab. This should take you to the Identity and Access
    Management (IAM) Console.
@@ -38,8 +38,8 @@ Don't forget to run `pipenv lock -r > requirements.txt` after installing boto3!
 8. Name the user whatever you like and give the user `Programmatic access`.
    Click `Next: Permissions`
 9. Here is where you'll set up the security policy for your new user.
-    * Click `Attach existing policies directly`
-    * Click `Create Policy`. This will open up in a new tab.
+   - Click `Attach existing policies directly`
+   - Click `Create Policy`. This will open up in a new tab.
 10. In the new tab, click on the `JSON` tab and paste the following:
 
 ```json
@@ -55,27 +55,30 @@ Don't forget to run `pipenv lock -r > requirements.txt` after installing boto3!
   ]
 }
 ```
-* Make sure to replace `<NAME OF BUCKET>` with the name of your bucket.
-* Click `Next: Tags`
-* Click `Next: Review`
-* Give the policy a name (maybe something like `s3-access-to-name-of-project`).
-* Click `Create policy`
 
-11. After creating the policy, go back to the IAM Management Console where you
-    were creating a user.
+- Make sure to replace `<NAME OF BUCKET>` with the name of your bucket.
+- Click `Next: Tags`
+- Click `Next: Review`
+- Give the policy a name (maybe something like `s3-access-to-name-of-project`).
+- Click `Create policy`
+
+10. After creating the policy, go back to the IAM Management Console where you
+   were creating a user.
 12. Click the refresh icon in the middle of the screen above the table of
-    policies.
+   policies.
 13. Search for your new policy and check the checkbox to the left of it.
 14. Click `Next: Tags`
 15. Click `Next: Review`
 16. Review your new user and make sure the policy you've attached is correct.
-    Then click `Create user`.
+   Then click `Create user`.
 17. You will now get the `Access Key ID` and the `Secret Access Key`. Make sure
-    to save both somewhere safe. You can (should) download the `.csv` file.
-    **Store this somewhere safe on your computer.**
-    * Note: If you don't somehow get your keys here, you will have to generate
-      new keys through IAM because AWS will not give you an old secret key after
-      this page.
+   to save both somewhere safe. You can (should) download the `.csv` file.
+   **Store this somewhere safe on your computer.**
+   - Note: If you don't somehow get your keys here, you will have to generate
+     new keys through IAM because AWS will not give you an old secret key after
+     this page.
+
+[aws.amazon.com]: https://aws.amazon.com/
 
 ## Set up AWS S3 in your backend
 
@@ -89,18 +92,19 @@ S3_BUCKET_NAME=<your bucket name>
 S3_ACCESS_KEY=<your aws access key>
 S3_SECRET_ACCESS_KEY=<your aws secret access key>
 ```
+
 Make sure that these are set in your BACKEND `.env` file (the one in the root of
-your project). Now is  a very good time to double-check that your `.env` is
+your project). Now is a very good time to double-check that your `.env` is
 listed in your backend `.gitignore`.
 
-*Note: You will need to provide these keys to Heroku when you are ready to
-deploy.*
+_Note: You will need to provide these keys to Heroku when you are ready to
+deploy._
 
 #### `config.py`
 
 Now that we've added our AWS Keys to our `.env`, we will want to access them
-through the rest of our app.  To do that, add the following lines to your Config
-class inside your `config.py` file. 
+through the rest of our app. To do that, add the following lines to your Config
+class inside your `config.py` file.
 
 ```python
 S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
@@ -109,7 +113,7 @@ S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
 S3_LOCATION = f"http://{S3_BUCKET}.s3.amazonaws.com/"
 ```
 
-  Your entire `config.py` file should now look something like this:
+Your entire `config.py` file should now look something like this:
 
 ```python
 import os
@@ -130,7 +134,7 @@ class Config:
 #### `aws_s3.py`
 
 Make a file called `aws_s3.py` as a module inside of your Flask `app` directory.
-Copy the following code inside: 
+Copy the following code inside:
 
 ```python
 import boto3
@@ -174,14 +178,14 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
 ```
 
 Here we are defining our function that will allow you to store a file to your S3
-bucket.  Notice that it takes in a `file`, `bucket_name` and an argument called
-`acl` that is set to `"public-read"` by default.  Because of this default param,
+bucket. Notice that it takes in a `file`, `bucket_name` and an argument called
+`acl` that is set to `"public-read"` by default. Because of this default param,
 when we are ready to call this function we only need to pass in our `file` and
 our `bucket_name`.
 
 Also note that inside our function we are calling the `s3.upload_fileobj`
-method.  In addition to passing this method our `file` and `bucket_name`, we are
-giving it an `ExrtaArgs` object that contains our POST request headers.  Thanks
+method. In addition to passing this method our `file` and `bucket_name`, we are
+giving it an `ExrtaArgs` object that contains our POST request headers. Thanks
 to these `ExtraArgs` we do not need to specify any request headers when making
 our POST request.
 
@@ -192,7 +196,6 @@ bucket.
 ```python
 return f"{Config.S3_LOCATION}{file.filename}"
 ```
-
 
 By now, your whole `aws_s3.py` file should look like this:
 
@@ -232,49 +235,50 @@ def upload_file_to_s3(file, bucket_name, acl="public-read"):
     return f"{Config.S3_LOCATION}{file.filename}"
 ```
 
-
 #### If you haven't already:
+
 ### MAKE SURE TO GITIGNORE YOUR .ENV FILE
 
 ## Sending Your POST request
 
-Now it's time to set up our POST request by way of a Redux thunk.  Hopefully you
-know by how to submit a form from your React component through to a thunk!  The
+Now it's time to set up our POST request by way of a Redux thunk. Hopefully you
+know by how to submit a form from your React component through to a thunk! The
 form we are receiving should contain the file we are intending to upload along
-with all other necessary fields to persist to our database.  An example looks
+with all other necessary fields to persist to our database. An example looks
 like this:
 
 ```javascript
 export const uploadFile = (fileForm) => async (dispatch) => {
-    const {
-        user_id,
-        /* all,
+  const {
+    user_id,
+    /* all,
            other,
            form,
            fields, */
-           file // this is the file for uploading
-    } = fileForm
-}
+    file, // this is the file for uploading
+  } = fileForm;
+};
 ```
+
 Here we destructure the file and associated form fields from the initial form
-submission.  Next we will package them up in a new upload-worthy style form.
+submission. Next we will package them up in a new upload-worthy style form.
 
 ```javascript
- const form = new FormData()
- form.append('user_id', user_id)
- // repeat as necessary for each required form field
- form.append('file', file)
+const form = new FormData();
+form.append("user_id", user_id);
+// repeat as necessary for each required form field
+form.append("file", file);
 ```
 
 We've now created a new FormData object and appended our file and associated
-form fields.  This object is now ready to submit to our backend to get persisted
-in our data base.  We will do so by setting the following:
+form fields. This object is now ready to submit to our backend to get persisted
+in our data base. We will do so by setting the following:
 
 ```javascript
-const res = await fetch('/api/<your_api_route>', {
-    method: "POST", 
-    body: form
-})
+const res = await fetch("/api/<your_api_route>", {
+  method: "POST",
+  body: form,
+});
 ```
 
 Remember how we already prescribed our request headed back in our `aws_s3.py`?
@@ -285,38 +289,38 @@ by your actual API route):
 
 ```javascript
 export const uploadFile = (fileForm) => async (dispatch) => {
-    const {
-        user_id,
-        /* all,
+  const {
+    user_id,
+    /* all,
            other,
            form,
            fields, */
-           file // this is the file for uploading
-    } = fileForm;
+    file, // this is the file for uploading
+  } = fileForm;
 
-    const form = new FormData();
-    form.append('user_id', user_id);
-    // repeat as necessary  for each required form field
-    form.append('file', file);
+  const form = new FormData();
+  form.append("user_id", user_id);
+  // repeat as necessary  for each required form field
+  form.append("file", file);
 
-    const res = await fetch('/api/<your_api_route>', {
-        method: "POST", 
-        body: form
-    });
+  const res = await fetch("/api/<your_api_route>", {
+    method: "POST",
+    body: form,
+  });
 };
 ```
 
 We'll let you figure out what to do with the rest of the thunk, but for now
 she's ready to hit your backend!
 
-## Setting Your Route 
+## Setting Your Route
 
 Here we will set up our route that will call our `upload_file_to_s3` function
-that we've defined in our `aws_s3.py` file. We will  then push the resulting URL
+that we've defined in our `aws_s3.py` file. We will then push the resulting URL
 to our database.
 
 If you haven't already, create a `route` file inside the `api` directory of your
-app.  The path should look something like this:  `app/api/<you_route_file.py>`
+app. The path should look something like this: `app/api/<you_route_file.py>`
 
 Begin by including these import statements along with all of your usual ones.
 
@@ -331,12 +335,13 @@ from app.aws_s3 import *
 from app.models import db, <Your_Model>
 #any other imports as needed
 ```
+
 Be sure to replace `<Your_Model>` with the name of the Model you will be
 persisting to.
 
 Next we will define our route. For the sake of this walkthrough let's call it
-`file_routes`.  This where we will call our file uploading function as well
-receive the file we will be passing into it.  This is where the magic happens! 
+`file_routes`. This where we will call our file uploading function as well
+receive the file we will be passing into it. This is where the magic happens!
 
 ```python
 
@@ -351,26 +356,27 @@ def upload_file:
         return "No user_file key in request.files"
 
     file = request.files["file"]
-    
+
     if file:
          file_url = upload_file_to_s3(file, Config.S3_BUCKET)
          # create an instance of <Your_Model>
          file = File(
              user_id=request.form.get('user_id')
-             # extract any form fields you've appended to the 
-             # body of your POST request 
+             # extract any form fields you've appended to the
+             # body of your POST request
              # i.e.
              url=file_url
-         )  
-         db.session.add(file)  
+         )
+         db.session.add(file)
          db.session.commit()
-         return file.to_dict()  
-     else: return No File Attached! 
+         return file.to_dict()
+     else: return No File Attached!
 ```
+
 Here we've used Flask's request object to parse our POST request, which allows
 us to pass our intended file through the `upload_file_to_s3` method and retrieve
-our AWS URL.  We can further use `request.form.get('<field_name>')` to parse out
-each incoming form field and add them to our Model instance.  Finally we pass in
+our AWS URL. We can further use `request.form.get('<field_name>')` to parse out
+each incoming form field and add them to our Model instance. Finally we pass in
 our `file_url` that we received from our S3 Bucket and assign it to the
 specified column in our model.
 
@@ -402,19 +408,19 @@ def upload_file:
         # create an instance of <Your_Model>
         file = File(
             user_id=request.form.get('user_id')
-            #extract any form fields you've appended to the 
-            #body of your POST request 
+            #extract any form fields you've appended to the
+            #body of your POST request
             #i.e.
             url=file_url
-        )  
-        db.session.add(file)  
+        )
+        db.session.add(file)
         db.session.commit()
-        return file.to_dict()  
-     else: return No File Attached! 
+        return file.to_dict()
+     else: return No File Attached!
 
 ```
 
-And that's It!  If you did everything correctly you should be able to start
+And that's It! If you did everything correctly you should be able to start
 storing files to your S3 Bucket and pushing their corresponding URL into your
 database.
 
@@ -433,5 +439,3 @@ projects.
 How to set up uploading and reading public files on the backend.
 
 #### Public File Write Configuration
-
-
